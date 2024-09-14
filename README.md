@@ -150,7 +150,7 @@ def generate_report(vulnerabilities, file_name="xss_report.json"):
         json.dump(vulnerabilities, report_file, indent=4)
     print(f"Report generated: {file_name}")
 ```
-## Sample Report
+### Sample Report
 
 ```json
 {
