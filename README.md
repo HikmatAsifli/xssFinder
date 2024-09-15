@@ -33,7 +33,7 @@ Ensure that you have `Python 3.x` installed. You can download it from the offici
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/HikmatAsifli/xssFinder.gitk
+git clone https://github.com/HikmatAsifli/xssFinder.git
 cd xssFinder
 ```
 
@@ -82,7 +82,7 @@ PAYLOADS = [
 
 If you need to adjust the request timeout for slower servers, modify the TIMEOUT variable in settings.py:
 
-```pyhton
+```python
 TIMEOUT = 10  # Set timeout to 10 seconds
 ```
 ## Batch Scanning
