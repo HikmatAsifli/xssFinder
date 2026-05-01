@@ -1,7 +1,18 @@
 # XSS Finder
 
-**XSS Finder** is an automated tool designed to detect Cross-Site Scripting (XSS) vulnerabilities in web applications. It uses a set of predefined payloads to scan target URLs and logs the results. Additionally, the tool generates detailed reports of any identified vulnerabilities in JSON format, allowing for easy tracking and analysis.
+**XSS Finder** is an automated tool designed to detect Cross-Site Scripting (XSS) vulnerabilities in web applications. It uses a comprehensive set of predefined payloads organized by category to scan target URLs and logs the results. Additionally, the tool generates detailed reports of any identified vulnerabilities in JSON format, allowing for easy tracking and analysis.
 
+## 🚀 New Features (Version 2.0)
+
+- **Categorized Payloads**: payloads organized into 5 categories (basic, encoded, event_handlers, dom_based, filter_bypass)
+- **Advanced CLI**: Full command-line interface with multiple options
+- **Category-based Scanning**: Scan with specific payload categories
+- **Multiple Parameter Testing**: Tests against common parameters (q, search, query, input, etc.)
+- **URL Path Injection**: Tests payload injection in URL paths
+- **Enhanced Reporting**: Comprehensive JSON reports with statistics, risk levels, and recommendations
+- **Verbose Mode**: Real-time scan progress output
+- **Input Validation**: URL validation and input sanitization utilities
+- **Better Logging**: Enhanced logging with parameter, method, and status code information
 
 ## Table of Contents
 
@@ -10,20 +21,27 @@
 - [Usage](#usage)
   - [Basic Scanning](#basic-scanning)
   - [Advanced Scanning](#advanced-scanning)
+  - [CLI Options](#cli-options)
+- [Payload Categories](#payload-categories)
 - [Configuration](#configuration)
 - [Logging](#logging)
 - [Report Generation](#report-generation)
+- [Testing](#testing)
 - [Extending the Tool](#extending-the-tool)
 - [Best Practices](#best-practices)
 - [Contributing](#contributing)
 - [License](#license)
+
 ## Features
 
-- **Targeted XSS Scanning**: Input a target URL to test against various XSS payloads.
-- **Configurable Payloads**: Easily add or modify payloads for testing.
-- **Detailed Logging**: Capture the results of each scan, including payloads tested and vulnerabilities found.
-- **Automated Reporting**: Generate comprehensive JSON reports of vulnerabilities.
-- **Customizable Settings**: Set request timeouts, and log locations, and manage scan configurations with ease.
+- **Targeted XSS Scanning**: Input a target URL to test against various XSS payloads
+- **Configurable Payloads**: 25+ payloads organized in 5 categories for comprehensive testing
+- **Multi-Parameter Testing**: Automatically tests common parameters (q, search, query, input, text, keyword, id, name, page)
+- **Multiple Injection Points**: Tests GET parameters, POST data, and URL path injection
+- **Detailed Logging**: Capture the results of each scan, including payloads tested, parameters, methods, and status codes
+- **Automated Reporting**: Generate comprehensive JSON reports with statistics, risk assessment, and remediation recommendations
+- **Customizable Settings**: Set request timeouts, choose payload categories, and manage scan configurations
+- **Verbose Output**: Real-time progress tracking during scans
 ## Installation
 
 ### Prerequisites
@@ -48,124 +66,196 @@ pip install -r requirements.txt
 
 ## Usage
 
-Basic Scanning
+### Basic Scanning
 
 To run a basic scan against a target URL, execute the following command:
 
 ```bash
-python src/main.py
+cd src
+python main.py -u https://example.com
 ```
 
-You will be prompted to enter the target URL:
+The script will test all payloads against common parameters and log any detected vulnerabilities.
 
-```bash 
-Enter the target URL: https://example.com
+### Advanced Scanning
+
+XSS Finder offers several advanced options for customized scanning:
+
+#### CLI Options
+
+```bash
+python main.py --help
+
+usage: main.py [-h] [-u URL] [-c {basic,encoded,event_handlers,dom_based,filter_bypass,all}] [-v] [-r REPORT] [-t TIMEOUT]
+
+XSS Finder - Automated XSS Vulnerability Scanner
+
+options:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     Target URL to scan
+  -c {basic,encoded,event_handlers,dom_based,filter_bypass,all}, --category 
+                        Payload category to test (default: all)
+  -v, --verbose         Enable verbose output
+  -r REPORT, --report REPORT
+                        Generate report to specified file
+  -t TIMEOUT, --timeout TIMEOUT
+                        Request timeout in seconds (default: 5)
 ```
-The script will then inject predefined XSS payloads and log any detected vulnerabilities.
-## Advanced Scanning
 
-For advanced users, XSS Finder offers several customization options. You can modify payloads, adjust settings, and generate more comprehensive reports.
+#### Examples
 
-### Custom Payloads
+**Scan with verbose output:**
+```bash
+python main.py -u https://example.com -v
+```
 
-To use custom payloads, simply modify or add new payloads to the `src/payloads/payloads.py` file:
+**Scan only basic payloads:**
+```bash
+python main.py -u https://example.com -c basic
+```
 
+**Custom timeout and report file:**
+```bash
+python main.py -u https://example.com -t 10 -r custom_report.json
+```
+
+**Scan with filter bypass payloads:**
+```bash
+python main.py -u https://example.com -c filter_bypass -v
+```
+
+## Payload Categories
+
+XSS Finder includes 25+ payloads organized into 5 categories:
+
+| Category | Description | Count |
+|----------|-------------|-------|
+| `basic` | Standard XSS payloads | 5 |
+| `encoded` | URL and HTML encoded payloads | 4 |
+| `event_handlers` | Event handler-based payloads | 5 |
+| `dom_based` | DOM-based XSS payloads | 3 |
+| `filter_bypass` | WAF/filter bypass payloads | 5 |
+
+### Category Examples
+
+**Basic:**
 ```python
-PAYLOADS = [
-    "<script>alert('XSS')</script>",
-    "<img src=x onerror=alert('XSS')>",
-    "';alert(String.fromCharCode(88,83,83))//",
-    "<svg onload=alert(1)>"
-]
+"<script>alert('XSS')</script>"
+"<img src=x onerror=alert('XSS')>"
+"<svg onload=alert(1)>"
 ```
-## Timeout Configuration
 
-If you need to adjust the request timeout for slower servers, modify the TIMEOUT variable in settings.py:
-
+**Encoded:**
 ```python
-TIMEOUT = 10  # Set timeout to 10 seconds
+"%3Cscript%3Ealert('XSS')%3C/script%3E"
+"&#60;script&#62;alert('XSS')&#60;/script&#62;"
 ```
-## Batch Scanning
 
-You can scan multiple URLs by looping through them in the `main.py` file. For example:
-
+**Filter Bypass:**
 ```python
-urls = ["https://example1.com", "https://example2.com"]
-
-for url in urls:
-    # Call scanner for each URL
-    scan_url(url)
+"<ScRiPt>alert('XSS')</ScRiPt>"
+"<scr<script>ipt>alert('XSS')</scr</script>ipt>"
 ```
 ## Configuration
 
-The `config/settings.py` file contains key settings for the script:
+The `src/configs/settings.py` file contains key settings for the script:
 
-- **TARGET_URL**: Input the URL for scanning. This can be set directly or prompted during runtime.
-- **TIMEOUT**: Define the request timeout in seconds.
+- **TIMEOUT**: Request timeout in seconds (default: 5)
+- **TARGET_URL**: Default target URL (empty by default, use CLI to specify)
+- **DEFAULT_CATEGORIES**: List of payload categories to use
+- **LOG_FILE**: Location of the log file
+- **DEFAULT_REPORT_FILE**: Default report output filename
+
 *Example settings:*
 
 ```python
-TARGET_URL = input("Enter the target URL: ")
 TIMEOUT = 5  # Request timeout in seconds
+TARGET_URL = ""  # Empty requires CLI input
+DEFAULT_CATEGORIES = ['basic', 'encoded', 'event_handlers', 'dom_based', 'filter_bypass']
 ```
-## Payload Configuration
 
-Payloads are defined in `src/payloads/payloads.py`. Modify the predefined payloads or add new ones to extend the scanning capabilities:
-
-```python
-PAYLOADS = [
-    "<script>alert('XSS')</script>",
-    "<img src=x onerror=alert('XSS')>",
-    "';alert(String.fromCharCode(88,83,83))//",
-    "<svg onload=alert(1)>"
-]
-```
 ## Logging
 
-XSS Finder maintains a detailed log of all scan results in `logs/scan.log`. The log contains information about which payloads were tested and whether the target was vulnerable:
+XSS Finder maintains a detailed log of all scan results in `logs/scan.log`. The log contains comprehensive information about each test:
 
 ```log
-2024-09-14 10:15:30 Payload: <script>alert('XSS')</script>, Vulnerable: True
-2024-09-14 10:15:32 Payload: <img src=x onerror=alert('XSS')>, Vulnerable: False
+2024-09-14 10:15:30 Payload: <script>alert('XSS')</script>, Vulnerable: True, Parameter: q, Method: GET/POST, Status: 200
+2024-09-14 10:15:32 Payload: <img src=x onerror=alert('XSS')>, Vulnerable: False, Parameter: search, Method: GET/POST, Status: 200
 ```
 
-To customize the logging format or log location, edit `utils/utils.py`:
-
-```python
-logging.basicConfig(filename='logs/scan.log',
-                    format='%(asctime)s %(message)s',
-                    level=logging.INFO)
-```
-## Log Customization
-
-You can also log additional data such as HTTP responses, payload execution time, and more by extending the `log_scan_results` function in `utils/utils.py`.
 ## Report Generation
-At the end of each scan, XSS Finder generates a JSON report detailing the vulnerabilities found. The report is saved as `xss_report.json` in the project directory and includes all tested payloads and the vulnerability status of the target.
 
-To customize report generation, edit `src/reports/report_generator.py`:
+At the end of each scan, XSS Finder generates a comprehensive JSON report. The report includes:
 
-```python
-def generate_report(vulnerabilities, file_name="xss_report.json"):
-    with open(file_name, 'w') as report_file:
-        json.dump(vulnerabilities, report_file, indent=4)
-    print(f"Report generated: {file_name}")
-```
-### Sample Report
+- **Metadata**: Tool version, generation timestamp
+- **Scan Summary**: Target URL, total tests, vulnerabilities found, risk level
+- **Vulnerabilities by Category**: Grouped findings by payload category
+- **Vulnerabilities by Parameter**: Grouped findings by vulnerable parameter
+- **Detailed Findings**: Complete list of all vulnerabilities
+- **Recommendations**: Security remediation suggestions
+
+### Sample Report Structure
 
 ```json
 {
-    "target_url": "https://example.com",
-    "vulnerabilities": [
-        {
-            "payload": "<script>alert('XSS')</script>",
-            "vulnerable": true
-        },
-        {
-            "payload": "<img src=x onerror=alert('XSS')>",
-            "vulnerable": false
-        }
+    "report_metadata": {
+        "generated_at": "2024-09-14T10:15:30",
+        "tool_name": "XSS Finder",
+        "version": "2.0"
+    },
+    "scan_summary": {
+        "target_url": "https://example.com",
+        "total_tests": 25,
+        "vulnerabilities_found": 3,
+        "risk_level": "MEDIUM"
+    },
+    "vulnerabilities_by_category": {
+        "basic": [...],
+        "event_handlers": [...]
+    },
+    "recommendations": [
+        "Implement proper input validation and sanitization",
+        "Use Content Security Policy (CSP) headers",
+        "Encode output data appropriately"
     ]
 }
+```
+
+## Testing
+
+Run the test suite to verify functionality:
+
+```bash
+# Run utility tests
+cd tests
+python test_utils.py -v
+
+# Run scanner tests (may take longer due to network requests)
+python test_scanner.py -v
+```
+
+## Extending the Tool
+
+### Adding New Payloads
+
+To add new XSS payloads, edit `src/payloads/xss_payloads.py`:
+
+```python
+PAYLOADS = {
+    "basic": [
+        "<script>alert('XSS')</script>",
+        # Add your new payloads here
+    ],
+    # ... other categories
+}
+```
+
+### Custom Parameters
+
+To test additional parameters, modify the `common_params` list in `src/scanner.py`:
+
+```python
+common_params = ['q', 'search', 'query', 'input', 'text', 'keyword', 'id', 'name', 'page', 'your_param']
 ```
 ## Extending the Tool
 ### Adding New Payloads

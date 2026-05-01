@@ -1,10 +1,14 @@
 # Configurations for XSS Finder
-TIMEOUT = 5  # Request timeout
+TIMEOUT = 5  # Request timeout in seconds
 
-# Configurations for XSS Finder
-TARGET_URL = input("Enter the target URL: ")
+# Default target URL (can be overridden via command line)
+TARGET_URL = ""  # Set to empty to require command-line input
 
-# Check if the target URL has a scheme, if not, add 'http://'
-if not TARGET_URL.startswith(('http://', 'https://')):
-    TARGET_URL = 'http://' + TARGET_URL
+# Scan settings
+DEFAULT_CATEGORIES = ['basic', 'encoded', 'event_handlers', 'dom_based', 'filter_bypass']
+MAX_CONCURRENT_REQUESTS = 5  # For future multi-threading support
+
+# Output settings
+LOG_FILE = 'logs/scan.log'
+DEFAULT_REPORT_FILE = 'xss_report.json'
 
