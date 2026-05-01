@@ -1,5 +1,9 @@
-/src/__pycache__
-/src/configs/__pycache__
-/src/payloads/__pycache__
-/src/utils/__pycache__
-/tests/__pycache__
+```
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Logs
+*.log
+logs/
+```
